@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/12 15:51:27 by user42            #+#    #+#             */
-/*   Updated: 2022/04/21 18:09:49 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/03 13:29:45 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,109 @@
 #include <sys/time.h>
 #include <fcntl.h>
 
+struct client{
+    int client_socket;
+    std::string nickname;
+    std::string username;
+    std::string pass;
+    bool        is_registered = false;
+    std::string registration_status = "Unregistered";
+};
+
+void    finish_registration(client cli){
+    std::string toSend;
+    toSend = ":Welcome to the test Network, " + cli.nickname + "\r\n";
+    toSend += ":Your host is irctest, running version 0.1\r\n";
+    toSend += ":This server was created 03/05/2022;1:09\r\n";
+    toSend += "irctest 0.1\r\n";
+    toSend += ":There are 0 users and 0 invisible on 0 servers\r\n";
+    toSend += "0 :operator(s) online\r\n";
+    toSend += "0 :unknown(s) connection\r\n";
+    toSend += "0 :channels formed\r\n";
+    toSend += ":I have 0 clients and 0 servers\r\n";
+    toSend += "BIEVENUE\r\n";
+    send(cli.client_socket, toSend.c_str(), toSend.length(), 0);
+}
+
+void    check_receive(std::string buffer, client cli){
+    std::string tmp = buffer.substr(0, 5);
+
+    if (tmp.compare("PASS ") == 0){
+        std::cout << "PASS FOUND" << std::endl;
+        cli.pass = buffer.substr(5, buffer.length());
+    }
+}
+
+void    clean_string(std::string &str){
+    if (str[str.length() - 1] == '\n'){
+        str.pop_back();
+    }
+    if (str[str.length() - 1] == '\r'){
+        str.pop_back();
+    }
+}
+
+bool    register_client(client &cli, std::string buffer){
+    int index = 0;
+    std::string tmp = buffer.substr(0, 5);
+    if (cli.registration_status.compare("Unregistered") == 0){
+        if (tmp.compare("CAP L") == 0){
+            index = 5;
+            while (buffer[index] && buffer[index] != '\n'){
+                index++;
+            }
+            if (buffer[index + 1]){
+                index++;
+                buffer.erase(0, index);
+                register_client(cli, buffer);
+            }
+        }
+        if (tmp.compare("PASS ") == 0){
+            index = 5;
+            while (buffer[index] && buffer[index] != '\n'){
+                index++;
+            }
+            cli.pass = buffer.substr(5, index - 4);
+            clean_string(cli.pass);
+            cli.registration_status = "PASS";
+            if (buffer[index + 1]){
+                index++;
+                buffer.erase(0, index);
+                register_client(cli, buffer);
+            }
+        }
+    }
+    if (cli.registration_status.compare("PASS") == 0 || cli.registration_status.compare("Unregistered") == 0){
+        if (tmp.compare("NICK ") == 0){
+            index = 5;
+            while (buffer[index] && buffer[index] != '\n'){
+                index++;
+            }
+            cli.nickname = buffer.substr(5, index - 4);
+            clean_string(cli.nickname);
+            cli.registration_status = "NICK";
+            if (buffer[index + 1]){
+                index++;
+                buffer.erase(0, index);
+                register_client(cli, buffer);
+            }
+        }
+    }
+    if (cli.registration_status.compare("NICK") == 0){
+        if (tmp.compare("USER ") == 0){
+            index = 5;
+            while (buffer[index] && buffer[index] != '\n'){
+                index++;
+            }
+            cli.username = buffer.substr(5, index - 4);
+            clean_string(cli.username);
+            cli.registration_status = "USER";
+            cli.is_registered = true;
+            finish_registration(cli);
+        }
+    }
+    return true;
+}
 
 int quit_check(char *buffer){
     std::string tmp = buffer;
@@ -49,11 +152,7 @@ std::string get_buff_val(char *buffer){
     return tmp;
 }
 
-struct client{
-    int client_socket;
-    std::string nickname;
-    std::string username;
-};
+
 //CONFIG IRC SERVEUR
 //
 //
@@ -156,11 +255,6 @@ int main(int ac, char **av){
             for (int i = 0; i < max_clients; i++){
                 if (client[i].client_socket == 0){
                     client[i].client_socket = new_socket;
-                    valread = recv(new_socket, buffer, 1024, 0);
-                    std::cout << buffer;
-                    send(client[i].client_socket, "CAP * LS :", 10, 0);
-                    valread = recv(new_socket, buffer, 1024, 0);
-                    std::cout << buffer;
                     // // client[i].nickname = get_buff_val(buffer);
                     // valread = recv(client[i].client_socket, buffer, 1024, 0);
                     // std::cout << buffer;
@@ -182,9 +276,15 @@ int main(int ac, char **av){
                     close(sd);
                     client[i].client_socket = 0;
                 }
+                else if (client[i].is_registered == false){
+                    buffer[valread] = '\0';
+                    if(register_client(client[i], buffer) == false){
+                        std::cout << "Client Registration Failed" << std::endl;
+                    }       
+                }
                 else{
                     buffer[valread] = '\0';
-                    std::cout << "BUFFER: " << buffer << std::endl;
+                    std::cout << "BUFFER: " << std::endl;
                     if (!(quit_check(buffer))){
                         close(sd);
                         client[i].client_socket = 0;
@@ -194,6 +294,7 @@ int main(int ac, char **av){
                             }
                         }
                     }
+                    check_receive(buffer, client[i]);
                     for(int j = 0; j < max_clients; j++){
                         if (client[j].client_socket > 0){
                             // send(client[j].client_socket, client[i].nickname.c_str(), client[i].nickname.length(), 0);
