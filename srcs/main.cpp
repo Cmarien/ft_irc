@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/12 15:51:27 by user42            #+#    #+#             */
-/*   Updated: 2022/05/03 13:29:45 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/17 16:50:29 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,28 +22,50 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#include "command.hpp"
+
+#define LINEEND "\r\n"
 
 struct client{
     int client_socket;
     std::string nickname;
     std::string username;
+    std::string realname;
     std::string pass;
+    std::string host;
+    std::string server_name;
     bool        is_registered = false;
     std::string registration_status = "Unregistered";
+    command comm;
 };
+
+std::string get_prefix(client cli){
+    return cli.nickname + "!" + cli.username + "@" + cli.server_name;
+}
 
 void    finish_registration(client cli){
     std::string toSend;
-    toSend = ":Welcome to the test Network, " + cli.nickname + "\r\n";
-    toSend += ":Your host is irctest, running version 0.1\r\n";
-    toSend += ":This server was created 03/05/2022;1:09\r\n";
-    toSend += "irctest 0.1\r\n";
-    toSend += ":There are 0 users and 0 invisible on 0 servers\r\n";
-    toSend += "0 :operator(s) online\r\n";
-    toSend += "0 :unknown(s) connection\r\n";
-    toSend += "0 :channels formed\r\n";
-    toSend += ":I have 0 clients and 0 servers\r\n";
-    toSend += "BIEVENUE\r\n";
+    std::string version = "1.0";
+    std::string nbr = "0";
+    std::string server = "IRC";
+    std::string nul = "";
+    std::string date = "Today";
+    std::string motd = "Bienvenue sur le server IRC";
+    std::string umod = "aiwro";
+    std::string cmod = "Oovimnptkl";
+    toSend = ": NICK :" + cli.nickname + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 001 " + cli.nickname + " " + cli.comm.get_replies(1, get_prefix(cli), nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 002 " + cli.nickname + " " + cli.comm.get_replies(2, version, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 003 " + cli.nickname + " " + cli.comm.get_replies(3, date, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 004 " + cli.nickname + " " + cli.comm.get_replies(4, server, version, umod, cmod, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 251 " + cli.nickname + " " + cli.comm.get_replies(251, nbr, nbr, nbr, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 252 " + cli.nickname + " " + cli.comm.get_replies(252, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 253 " + cli.nickname + " " + cli.comm.get_replies(253, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 254 " + cli.nickname + " " + cli.comm.get_replies(254, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 255 " + cli.nickname + " " + cli.comm.get_replies(255, nbr, nbr, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 375 " + cli.nickname + " " + cli.comm.get_replies(375, server, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix(cli) + " 372 " + cli.nickname + " " + cli.comm.get_replies(372, motd, nul, nul, nul, nul, nul, nul) + LINEEND;
+    std::cout << toSend << std::endl;
     send(cli.client_socket, toSend.c_str(), toSend.length(), 0);
 }
 
@@ -67,6 +89,7 @@ void    clean_string(std::string &str){
 
 bool    register_client(client &cli, std::string buffer){
     int index = 0;
+    int tmpdex = 0;
     std::string tmp = buffer.substr(0, 5);
     if (cli.registration_status.compare("Unregistered") == 0){
         if (tmp.compare("CAP L") == 0){
@@ -114,10 +137,31 @@ bool    register_client(client &cli, std::string buffer){
     if (cli.registration_status.compare("NICK") == 0){
         if (tmp.compare("USER ") == 0){
             index = 5;
+            tmpdex = index;
+            while (buffer[index] && buffer[index] != ' '){
+                index++;
+            }
+            cli.username = buffer.substr(tmpdex, index - (tmpdex));
+            index++;
+            tmpdex = index;
+            while (buffer[index] && buffer[index] != ' '){
+                index++;
+            }
+            cli.host = buffer.substr(tmpdex, index - (tmpdex));
+            index++;
+            tmpdex = index;
+            while (buffer[index] && buffer[index] != ' '){
+                index++;
+            }
+            cli.server_name = buffer.substr(tmpdex, index - (tmpdex));
+            index++;
+            index++;
+            tmpdex = index;
             while (buffer[index] && buffer[index] != '\n'){
                 index++;
             }
-            cli.username = buffer.substr(5, index - 4);
+            cli.realname = buffer.substr(tmpdex, index - (tmpdex - 1));
+            // std::cout << "USER :" << cli.username << "-" << cli.host << "-" << cli.server_name << "-" << cli.realname << std::endl;
             clean_string(cli.username);
             cli.registration_status = "USER";
             cli.is_registered = true;
@@ -275,9 +319,18 @@ int main(int ac, char **av){
                     std::cout << "Client Disconnected, ip: " << inet_ntoa(address.sin_addr) << " port: " << ntohs(address.sin_port) << std::endl;
                     close(sd);
                     client[i].client_socket = 0;
+                    client[i].is_registered = false;
+                    client[i].registration_status = "Unregistered";
+                    client[i].nickname = "";
+                    client[i].username = "";
+                    client[i].server_name = "";
+                    client[i].pass = "";
+                    client[i].host = "";
+                    client[i].realname = "";
                 }
                 else if (client[i].is_registered == false){
                     buffer[valread] = '\0';
+                    std::cout << "Buff :" << buffer << std::endl;
                     if(register_client(client[i], buffer) == false){
                         std::cout << "Client Registration Failed" << std::endl;
                     }       
