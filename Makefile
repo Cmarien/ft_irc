@@ -1,5 +1,9 @@
 SRCS		=	srcs/main.cpp	\
-				srcs/replies.cpp
+				srcs/replies.cpp	\
+				srcs/client.cpp	\
+				srcs/utils.cpp	\
+				srcs/server.cpp	\
+				srcs/config.cpp	\
 
 OBJS_SRCS	=	$(SRCS:.cpp=.o)
 
