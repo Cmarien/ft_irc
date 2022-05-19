@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:09:22 by user42            #+#    #+#             */
-/*   Updated: 2022/05/18 17:34:18 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/19 17:06:35 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 #include "utils.hpp"
-#include "command.hpp"
 
 class client;
 
@@ -46,11 +45,12 @@ public:
 
     bool        is_registered;
 
-    command comm;
+    server *serv;
 
 
     bool    registr(std::string buffer, server &serv);
     void    finish_registration(server &serv);
+    void    process(std::string);
     std::string get_prefix();
     void    clear_client();
 

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:35:28 by user42            #+#    #+#             */
-/*   Updated: 2022/05/18 17:18:24 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/19 16:59:52 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void    clean_string(std::string &str){
     if (str[str.length() - 1] == '\n'){
-        str.pop_back();
+        str = str.substr(0, str.length() -2);
     }
     if (str[str.length() - 1] == '\r'){
-        str.pop_back();
+        str = str.substr(0, str.length() -2);
     }
 }
 

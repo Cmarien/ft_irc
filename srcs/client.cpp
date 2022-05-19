@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:20:14 by user42            #+#    #+#             */
-/*   Updated: 2022/05/18 17:37:04 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/19 16:44:34 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,18 +42,19 @@ void    client::finish_registration(server &serv){
     std::string date = "Today";
     std::string umod = "aiwro";
     std::string cmod = "Oovimnptkl";
+    this->serv = &serv;
     toSend = ": NICK :" + this->nickname + LINEEND;
-    toSend += ":" + get_prefix() + " 001 " + this->nickname + " " + this->comm.get_replies(1, get_prefix(), nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 002 " + this->nickname + " " + this->comm.get_replies(2, serv._config.version, nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 003 " + this->nickname + " " + this->comm.get_replies(3, date, nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 004 " + this->nickname + " " + this->comm.get_replies(4, serv._config.server_name, serv._config.version, umod, cmod, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 251 " + this->nickname + " " + this->comm.get_replies(251, nbr, nbr, nbr, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 252 " + this->nickname + " " + this->comm.get_replies(252, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 253 " + this->nickname + " " + this->comm.get_replies(253, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 254 " + this->nickname + " " + this->comm.get_replies(254, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 255 " + this->nickname + " " + this->comm.get_replies(255, nbr, nbr, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 375 " + this->nickname + " " + this->comm.get_replies(375, serv._config.server_name, nul, nul, nul, nul, nul, nul) + LINEEND;
-    toSend += ":" + get_prefix() + " 372 " + this->nickname + " " + this->comm.get_replies(372, serv._config.motd, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 001 " + this->nickname + " " + get_replies(1, get_prefix(), nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 002 " + this->nickname + " " + get_replies(2, serv._config.version, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 003 " + this->nickname + " " + get_replies(3, date, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 004 " + this->nickname + " " + get_replies(4, serv._config.server_name, serv._config.version, umod, cmod, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 251 " + this->nickname + " " + get_replies(251, nbr, nbr, nbr, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 252 " + this->nickname + " " + get_replies(252, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 253 " + this->nickname + " " + get_replies(253, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 254 " + this->nickname + " " + get_replies(254, nbr, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 255 " + this->nickname + " " + get_replies(255, nbr, nbr, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 375 " + this->nickname + " " + get_replies(375, serv._config.server_name, nul, nul, nul, nul, nul, nul) + LINEEND;
+    toSend += ":" + get_prefix() + " 372 " + this->nickname + " " + get_replies(372, serv._config.motd, nul, nul, nul, nul, nul, nul) + LINEEND;
     std::cout << toSend << std::endl;
     send(this->client_socket, toSend.c_str(), toSend.length(), 0);
 }

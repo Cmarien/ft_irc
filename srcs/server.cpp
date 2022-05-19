@@ -6,18 +6,36 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:42:17 by user42            #+#    #+#             */
-/*   Updated: 2022/05/18 17:39:15 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/19 17:04:06 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <limits>
+#include <errno.h>
+#include <stdlib.h>
 #include "server.hpp"
 
+ void    server::process(std::string buffer, client &cli){
+    size_t index = buffer.find(' ', 0);
+    std::string tmp;
+    if (index == std::numeric_limits<size_t>::max()){
+        std::cout << "space not found" << std::endl;
+    }
+    std::string cmd = buffer.substr(0, index);
+    std::string args = buffer.substr(index + 1, buffer.size() - (index + 2));
+    for (int i = 0; i < 7; i++){
+        if (cmd.compare(this->user_cmd[i]) == 0){
+            tmp = this->f[i](args, *this, cli) + LINEEND;
+            std::cout << "sending: " << tmp << std::endl;
+            send(cli.client_socket, tmp.c_str(), tmp.length(), 0);
+        }
+    }
+ }
 
 void    server::init_server(std::string _port, std::string _password){
     int opt = 1;
     this->port = get_port(_port);
     this->password = _password;
-    int addrlen;
 
 
     for(int i = 0; i < max_clients; i++){
@@ -124,6 +142,7 @@ void    server::run_server(){
                 else{
                     buffer[valread] = '\0';
                     std::cout << "BUFFER: " << buffer << std::endl;
+                    this->process(buffer, this->clients[i]);
                 }
             }
         }
@@ -132,6 +151,26 @@ void    server::run_server(){
 
 
 server::server(){
+    this->user_cmd[0] = "NICK";
+    this->user_cmd[1] = "PING";
+    this->user_cmd[2] = "PONG";
+    this->user_cmd[3] = "JOIN";
+    this->user_cmd[4] = "PART";
+    this->user_cmd[5] = "QUIT";
+    this->user_cmd[6] = "PRIVMSG";
+
+    this->f[0] = &nick;
+    this->f[1] = &ping;
+    this->f[2] = &pong;
+    this->f[3] = &join;
+    this->f[4] = &part;
+    this->f[5] = &quit;
+    this->f[6] = &privmsg;
+    // this->user_cmd[7] = "OPER";
+    // this->user_cmd[8] = "TOPIC";
+    // this->user_cmd[9] = "NAMES";
+    // this->user_cmd[10] = "LIST";
+    // this->user_cmd[11] = "INVITE";
 }
 
 server::~server(){

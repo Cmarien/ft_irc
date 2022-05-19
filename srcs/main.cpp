@@ -6,14 +6,13 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/12 15:51:27 by user42            #+#    #+#             */
-/*   Updated: 2022/05/18 17:35:23 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/19 16:51:27 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 #include "server.hpp"
 
 int quit_check(char *buffer){

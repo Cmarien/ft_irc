@@ -4,6 +4,7 @@ SRCS		=	srcs/main.cpp	\
 				srcs/utils.cpp	\
 				srcs/server.cpp	\
 				srcs/config.cpp	\
+				srcs/command.cpp	\
 
 OBJS_SRCS	=	$(SRCS:.cpp=.o)
 
@@ -14,7 +15,7 @@ INCLUDES	=	-I./includes/
 
 NAME		=	irc
 
-CFLAG      =   -Wall -Werror -Wextra -std=c++98
+CFLAGS      =   -Wall -Werror -Wextra -std=c++98
 
 CC			=	c++
 
