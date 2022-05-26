@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:42:17 by user42            #+#    #+#             */
-/*   Updated: 2022/05/19 17:04:06 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/26 12:42:27 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
         std::cout << "space not found" << std::endl;
     }
     std::string cmd = buffer.substr(0, index);
-    std::string args = buffer.substr(index + 1, buffer.size() - (index + 2));
-    for (int i = 0; i < 7; i++){
+    std::string args = buffer.substr(index + 1, buffer.size() - (index + 3));
+    for (int i = 0; i < 9; i++){
         if (cmd.compare(this->user_cmd[i]) == 0){
             tmp = this->f[i](args, *this, cli) + LINEEND;
             std::cout << "sending: " << tmp << std::endl;
@@ -158,7 +158,9 @@ server::server(){
     this->user_cmd[4] = "PART";
     this->user_cmd[5] = "QUIT";
     this->user_cmd[6] = "PRIVMSG";
-
+    this->user_cmd[7] = "MODE";
+    this->user_cmd[8] = "WHO";
+ 
     this->f[0] = &nick;
     this->f[1] = &ping;
     this->f[2] = &pong;
@@ -166,6 +168,8 @@ server::server(){
     this->f[4] = &part;
     this->f[5] = &quit;
     this->f[6] = &privmsg;
+    this->f[7] = &mode;
+    this->f[8] = &who;
     // this->user_cmd[7] = "OPER";
     // this->user_cmd[8] = "TOPIC";
     // this->user_cmd[9] = "NAMES";

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:09:22 by user42            #+#    #+#             */
-/*   Updated: 2022/05/19 17:06:35 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/26 10:27:41 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #define CLIENT_HPP
 
 #include <iostream>
-#include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>

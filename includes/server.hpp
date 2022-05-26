@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:41:46 by user42            #+#    #+#             */
-/*   Updated: 2022/05/19 17:07:00 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/26 12:41:54 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,13 @@
 
 #include "config.hpp"
 #include <fcntl.h>
+#include "channel.hpp"
+
 
 class server;
 
 #include "client.hpp"
 #include "command.hpp"
-
 
 
 class server
@@ -34,14 +35,15 @@ private:
     std::string password;
     client clients[30];
     struct sockaddr_in address;
-    std::string     user_cmd[7];
-    std::string    (*f[7])(std::string, server&, client&);
+    std::string     user_cmd[9];
+    std::string    (*f[9])(std::string, server&, client&);
 
 public:
     void    init_server(std::string _port, std::string _password);
     void    process(std::string buffer, client&);
     void    run_server();
     config  _config;
+    channel<client> channels[30];
     server();
     ~server();
 };
