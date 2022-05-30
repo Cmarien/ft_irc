@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 15:09:54 by user42            #+#    #+#             */
-/*   Updated: 2022/05/26 13:27:07 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/30 13:56:02 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,17 +66,39 @@ std::string    quit(std::string args, __attribute__((unused)) server &serv, __at
     return args;
 }
 std::string    privmsg(std::string args, __attribute__((unused)) server &serv, __attribute__((unused)) client& cli){
-    std::string toRet = ":" + cli.get_prefix() + " PRIVMSG " + args;
+    std::string toRet = ":" + cli.get_prefix() + " PRIVMSG " + args + "\r\n";
+    std::string target;
     int index = 0;
 
-    while (index < 30){
-        if (serv.channels[index].name.compare("#test") == 0){
-            serv.channels[index].send_to_clients(toRet);
-            break;
-        }
+    while (args[index] && args[index] != ' '){
         index++;
     }
-    return toRet;
+    target = args.substr(0, index);
+    
+    index = 0;
+
+    if (target[0] == '#'){
+        while (index < 30){
+            if (serv.channels[index].name.compare(target) == 0){
+                serv.channels[index].send_to_clients(toRet, cli.client_socket);
+            }
+            index++;
+        }
+    }
+    else
+    {
+        while (index < 30){
+            if (serv.clients[index].nickname.compare(target) == 0){
+                send(serv.clients[index].client_socket, toRet.c_str(), toRet.length(), 0);
+                send(serv.clients[index].client_socket, "SALUT SA VA\r\n", 13, 0);
+                break;
+            }
+            index++;
+        }
+    }
+    
+    
+    return "";
 }
 
 std::string    mode(std::string args, __attribute__((unused)) server &serv, __attribute__((unused)) client& cli){

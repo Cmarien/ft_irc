@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/12 15:51:27 by user42            #+#    #+#             */
-/*   Updated: 2022/05/19 16:51:27 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/30 14:10:33 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@ int main(int ac, char **av){
     }
     server server;
     server.init_server(av[1], av[2]);
+    std::cout << "FINI ???" << std::endl;
     return 0;
 }

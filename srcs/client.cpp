@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:20:14 by user42            #+#    #+#             */
-/*   Updated: 2022/05/19 16:44:34 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/30 14:43:59 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,16 @@ client::client(){
 }
 
 client::~client(){
+}
+
+bool    client::check_buff(){
+    if (this->buffer[this->buffer.length() - 2] == '\r' && this->buffer[this->buffer.length() - 1] == '\n')
+        return true;
+    return false;
+}
+
+void    client::clear_buff(){
+    this->buffer = "";
 }
 
 void    client::clear_client(){
@@ -73,7 +83,7 @@ bool    client::registr(std::string buffer, server &serv){
             if (buffer[index + 1]){
                 index++;
                 buffer.erase(0, index);
-                registr(buffer, serv);
+                return registr(buffer, serv);
             }
         }
         if (tmp.compare("PASS ") == 0){
@@ -87,7 +97,7 @@ bool    client::registr(std::string buffer, server &serv){
             if (buffer[index + 1]){
                 index++;
                 buffer.erase(0, index);
-                registr(buffer, serv);
+                return registr(buffer, serv);
             }
         }
     }
@@ -103,7 +113,7 @@ bool    client::registr(std::string buffer, server &serv){
             if (buffer[index + 1]){
                 index++;
                 buffer.erase(0, index);
-                registr(buffer, serv);
+                return registr(buffer, serv);
             }
         }
     }

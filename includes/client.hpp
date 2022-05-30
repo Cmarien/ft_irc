@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:09:22 by user42            #+#    #+#             */
-/*   Updated: 2022/05/26 10:27:41 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/30 14:34:04 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ public:
     std::string host;
     std::string server_name;
     std::string registration_status;
+    std::string buffer;
 
     bool        is_registered;
 
@@ -48,10 +49,12 @@ public:
 
 
     bool    registr(std::string buffer, server &serv);
+    bool    check_buff();
     void    finish_registration(server &serv);
     void    process(std::string);
     std::string get_prefix();
     void    clear_client();
+    void    clear_buff();
 
     client();
     ~client();

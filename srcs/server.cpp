@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:42:17 by user42            #+#    #+#             */
-/*   Updated: 2022/05/26 12:42:27 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/30 14:41:40 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@
         if (cmd.compare(this->user_cmd[i]) == 0){
             tmp = this->f[i](args, *this, cli) + LINEEND;
             std::cout << "sending: " << tmp << std::endl;
-            send(cli.client_socket, tmp.c_str(), tmp.length(), 0);
+            if (tmp.compare("")){
+                send(cli.client_socket, tmp.c_str(), tmp.length(), 0);
+            }
         }
     }
  }
@@ -121,7 +123,7 @@ void    server::run_server(){
                 }
             }
         }
-
+        
         for (int i = 0; i < max_clients; i++){
             sd = this->clients[i].client_socket;
 
@@ -135,14 +137,23 @@ void    server::run_server(){
                 else if (this->clients[i].is_registered == false){
                     buffer[valread] = '\0';
                     std::cout << "Buff :" << buffer << std::endl;
-                    if(this->clients[i].registr(buffer, *this) == false){
-                        std::cout << "Client Registration Failed" << std::endl;
-                    }       
+                    clients[i].buffer += buffer;
+                    if (clients[i].check_buff()){
+                        if(this->clients[i].registr(clients[i].buffer, *this) == false){
+                            std::cout << "Client Registration Failed" << std::endl;
+                        }
+                        clients[i].clear_buff();
+                    }
+                      
                 }
                 else{
                     buffer[valread] = '\0';
                     std::cout << "BUFFER: " << buffer << std::endl;
-                    this->process(buffer, this->clients[i]);
+                    clients[i].buffer += buffer;
+                    if (clients[i].check_buff()){
+                        this->process(clients[i].buffer, this->clients[i]);
+                        clients[i].clear_buff();
+                    }
                 }
             }
         }

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/25 13:38:26 by user42            #+#    #+#             */
-/*   Updated: 2022/05/26 13:22:48 by user42           ###   ########.fr       */
+/*   Updated: 2022/05/30 11:19:54 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <utility>
 #include <iostream>
 #include <sys/socket.h>
+#include "utils.hpp"
 
 template<class client>
 class channel
@@ -45,15 +46,21 @@ public:
         this->ops.insert(std::make_pair(sock, cli));
     }
 
-    void    send_to_clients(std::string toSend){
+    void    send_to_clients(std::string toSend, int nosend){
+        // std::string tmp;
+        std::cout << "TOSEND: " << std::endl;
         typename std::map<int, client>::iterator it = this->clients.begin();
         typename std::map<int, client>::iterator it2 = this->ops.begin();
         while (it != this->clients.end()){
-            send(it->first, toSend.c_str(), toSend.length(), 0);
+            if (it->first != nosend){
+                send(it->first, toSend.c_str(), toSend.length(), 0);
+            }
             it++;
         }
         while (it2 != this->ops.end()){
-            send(it->first, toSend.c_str(), toSend.length(), 0);
+            if (it2->first != nosend){
+                send(it2->first, toSend.c_str(), toSend.length(), 0);
+            }
             it2++;
         }
     }
