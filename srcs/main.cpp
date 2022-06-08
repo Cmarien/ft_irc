@@ -5,10 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/12 15:51:27 by user42            #+#    #+#             */
-/*   Updated: 2022/05/30 14:10:33 by user42           ###   ########.fr       */
+/*   Created: 2022/06/02 10:07:47 by user42            #+#    #+#             */
+/*   Updated: 2022/06/02 10:07:55 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include <stdio.h>
 #include <string.h>
@@ -22,11 +23,11 @@ int quit_check(char *buffer){
 
 int main(int ac, char **av){
     if (ac != 3){
-        std::cout << "Wrond number of args" << std::endl;
+        std::cout << "Wrong number of args" << std::endl;
+        std::cout << "Usage: ./ircserv [Port] [Password]" << std::endl;
         exit(EXIT_FAILURE);
     }
     server server;
     server.init_server(av[1], av[2]);
-    std::cout << "FINI ???" << std::endl;
     return 0;
 }

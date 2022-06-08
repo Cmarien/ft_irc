@@ -14,7 +14,7 @@ OBJS_SRCS	=	$(SRCS:.cpp=.o)
 
 INCLUDES	=	-I./includes/
 
-NAME		=	irc
+NAME		=	ircserv
 
 CFLAGS      =   -Wall -Werror -Wextra -std=c++98
 

@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/25 13:38:26 by user42            #+#    #+#             */
-/*   Updated: 2022/05/30 11:19:54 by user42           ###   ########.fr       */
+/*   Updated: 2022/06/08 14:50:17 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,19 @@ public:
     std::map<int, client> ops;
     std::string name;
     std::string topic;
-    std::string mods;
+    std::string modes;
     int number_clients;
 
     channel(){};
     ~channel(){};
+
+    std::string get_modes(){
+        return "";
+    }
+
+    std::string add_modes(__attribute__((unused)) std::string modestring, __attribute__((unused)) std::string mode_args){
+        return "";
+    }
 
     void add_client(int sock, client &cli){
         this->clients.insert(std::make_pair(sock, cli));
