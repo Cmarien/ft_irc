@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 10:07:18 by user42            #+#    #+#             */
-/*   Updated: 2022/06/08 17:31:41 by user42           ###   ########.fr       */
+/*   Updated: 2022/06/14 17:32:46 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,6 @@ std::string client::get_modes(){
 std::string client::add_modes(std::string modestring, __attribute__((unused)) std::string mode_arg){
 	int index = 0;
 	int err_check = 0;
-	std::string charset = "aiwro";
 	std::string toRet;
 
 	if (modestring[0] == '+' || modestring[0] == '-'){
