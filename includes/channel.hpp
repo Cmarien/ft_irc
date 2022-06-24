@@ -168,7 +168,7 @@ public:
 
         if (modestring[0] != '-'){
             while (modestring[index] && modestring[index] != '-'){
-                if (check_charset(modestring[index], "ovimnptkl")){
+                if (check_charset(modestring[index], "ovimnptklb")){
                     if (check_modes(modestring[index], this->modes)){
                         if (modestring[index] == 'o'){
                             if (is_client(mode_arg)){
@@ -184,10 +184,11 @@ public:
                             }
                         }
                         else if (modestring[index] == 'b'){
+                            std::cout << mode_arg << std::endl;
                             if (is_client(mode_arg)){
                                 ban_client(mode_arg);
                             }
-                            else {
+                            else if (is_op(mode_arg) == 0){
                                 // return ERR_USERNOTINCHANNEL(mode_arg, this->name);
                                 return ":" + cli.get_prefix() + " 441 " + cli.nickname + " " + get_replies(443, mode_arg, this->name, "", "", "", "", "");
                             }
@@ -209,7 +210,7 @@ public:
                 index++;
             }
             while (modestring[index]){
-                if (check_charset(modestring[index], "ovimnptkl")){
+                if (check_charset(modestring[index], "ovimnptkbl")){
                     if (check_modes(modestring[index], this->modes)){
                         this->remove_mode(modestring[index]);
                     }
@@ -222,7 +223,7 @@ public:
         }
         else{
             while (modestring[index] && modestring[index] != '+'){
-                if (check_charset(modestring[index], "Oovimnptkl")){
+                if (check_charset(modestring[index], "Oovimnbptkl")){
                     if (check_modes(modestring[index], this->modes) == 0){
                         if (modestring[index] != 'b'){
                             this->remove_mode(modestring[index]);
@@ -236,7 +237,6 @@ public:
             }
             while (modestring[index]){
                 if (check_charset(modestring[index], "Oovimnptkl")){
-                    if (check_charset(modestring[index], "ovimnptkl")){
                     if (check_modes(modestring[index], this->modes)){
                         if (modestring[index] == 'o'){
                             if (is_client(mode_arg)){
@@ -255,7 +255,7 @@ public:
                             if (is_client(mode_arg)){
                                 ban_client(mode_arg);
                             }
-                            else {
+                            else if (is_op(mode_arg) == 0){
                                 // return ERR_USERNOTINCHANNEL(mode_arg, this->name);
                                 return ":" + cli.get_prefix() + " 441 " + cli.nickname + " " + get_replies(443, mode_arg, this->name, "", "", "", "", "");
                             }
@@ -277,7 +277,6 @@ public:
                 index++;
                 }
             }
-        }
         toRet = ":" + cli.get_prefix() + " 324 " + cli.nickname + " " + get_replies(324, this->get_modes(), "", "", "", "", "", "");
         if (err_check){
             toRet += "\r\n:" + cli.get_prefix() + " 501 " + cli.nickname + " " + get_replies(501, "", "", "", "", "", "" ,"");

@@ -118,8 +118,13 @@ void    server::run_server() {
 			client newClient;
 			newClient.client_socket = new_socket;
 
-			this->clients.push_back(newClient);
-			++this->connectedUsers;
+			if (this->connectedUsers < 30){
+				this->clients.push_back(newClient);
+				++this->connectedUsers;
+			}
+			else{
+				close(new_socket);
+			}
 			std::cout << "Adding to list of sockets as " << this->clients.size() - 1 << std::endl;
 		}
 		
