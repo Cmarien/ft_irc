@@ -1,3 +1,7 @@
 name=IRC server
 version=1.0
 motd=Bienvenue sur l'IRC server
+umod=aiwro
+cmod=Oovimnptkl
+oper_name=user42
+oper_pass=user42

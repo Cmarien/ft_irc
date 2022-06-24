@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rmouduri <rmouduri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/25 13:38:26 by user42            #+#    #+#             */
-/*   Updated: 2022/06/14 18:24:20 by user42           ###   ########.fr       */
+/*   Updated: 2022/06/06 19:15:24 by rmouduri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,16 @@ public:
     std::string name;
     std::string topic;
     std::vector<char> modes;
+    std::vector<int> banlist;
+    std::vector<std::string> invitelist;
     int number_clients;
 
-    channel(){this->number_clients = 0;}
+    bool    invite_only;
+
+    channel(){
+        this->number_clients = 0;
+        this->invite_only = false;
+    }
     ~channel(){};
 
     void    remove_op(int sock){
@@ -58,6 +65,57 @@ public:
 
         while (it != ite){
             if (it->first == sock){
+                this->clients.erase(it);
+                break;
+            }
+            it++;
+        }
+        this->number_clients--;
+    }
+
+    void    remove_client(std::string name){
+        typename std::map<int, client>::iterator it = this->clients.begin();
+        typename std::map<int, client>::iterator ite = this->clients.end();
+
+        while (it != ite){
+            if (it->second.nickname.compare(name) == 0){
+                this->clients.erase(it);
+                break;
+            }
+            it++;
+        }
+        this->number_clients--;
+    }
+
+    void    kick_client(std::string name){
+        typename std::map<int, client>::iterator it = this->clients.begin();
+        typename std::map<int, client>::iterator ite = this->clients.end();
+        std::string toRet = ":";
+
+        while (it != ite){
+            if (it->second.nickname.compare(name) == 0){
+                toRet += it->second.get_prefix() + " PART " + this->name + "\r\n";
+                std::cout << toRet << std::endl;
+                send(it->first, toRet.c_str(), toRet.length(), 0);
+                this->clients.erase(it);
+                this->number_clients--;
+                return ;
+            }
+            it++;
+        }
+    }
+
+    void    ban_client(std::string name){
+        typename std::map<int, client>::iterator it = this->clients.begin();
+        typename std::map<int, client>::iterator ite = this->clients.end();
+        std::string toRet = ":";
+
+        while (it != ite){
+            if (it->second.nickname.compare(name) == 0){
+                toRet += it->second.get_prefix() + " PART " + this->name + "\r\n";
+                std::cout << toRet << std::endl;
+                this->banlist.push_back(it->first);
+                send(it->first, toRet.c_str(), toRet.length(), 0);
                 this->clients.erase(it);
                 break;
             }
@@ -118,12 +176,30 @@ public:
                             }
                             else if (is_op(mode_arg) == 0){
                                 if (mode_arg == ""){
-                                    toRet = ":" + cli.get_prefix() + " 431 " + cli.nickname + " " + get_replies(431, "", "", "", "", "", "", "");
+                                    return ":" + cli.get_prefix() + " 431 " + cli.nickname + " " + get_replies(431, "", "", "", "", "", "", "");
                                 }
                                 else{
-                                    toRet = ":" + cli.get_prefix() + " 401 " + cli.nickname + " " + get_replies(401, mode_arg, "", "", "", "", "", "");
+                                    return ":" + cli.get_prefix() + " 401 " + cli.nickname + " " + get_replies(401, mode_arg, "", "", "", "", "", "");
                                 }
                             }
+                        }
+                        else if (modestring[index] == 'b'){
+                            if (is_client(mode_arg)){
+                                ban_client(mode_arg);
+                            }
+                            else {
+                                // return ERR_USERNOTINCHANNEL(mode_arg, this->name);
+                                return ":" + cli.get_prefix() + " 441 " + cli.nickname + " " + get_replies(443, mode_arg, this->name, "", "", "", "", "");
+                            }
+                        }
+                        else if (modestring[index] == 'i'){
+                            if (this->invite_only == false){
+                                this->invite_only = true;
+                                this->modes.push_back('i');
+                            }
+                        }
+                        else{
+                            this->modes.push_back(modestring[index]);
                         }
                     }
                 }
@@ -148,7 +224,7 @@ public:
             while (modestring[index] && modestring[index] != '+'){
                 if (check_charset(modestring[index], "Oovimnptkl")){
                     if (check_modes(modestring[index], this->modes) == 0){
-                        if (modestring[index] != 'r'){
+                        if (modestring[index] != 'b'){
                             this->remove_mode(modestring[index]);
                         }
                     }
@@ -160,14 +236,46 @@ public:
             }
             while (modestring[index]){
                 if (check_charset(modestring[index], "Oovimnptkl")){
+                    if (check_charset(modestring[index], "ovimnptkl")){
                     if (check_modes(modestring[index], this->modes)){
-                        this->modes.push_back(modestring[index]);
+                        if (modestring[index] == 'o'){
+                            if (is_client(mode_arg)){
+                                put_op(mode_arg);
+                            }
+                            else if (is_op(mode_arg) == 0){
+                                if (mode_arg == ""){
+                                    return ":" + cli.get_prefix() + " 431 " + cli.nickname + " " + get_replies(431, "", "", "", "", "", "", "");
+                                }
+                                else{
+                                    return ":" + cli.get_prefix() + " 401 " + cli.nickname + " " + get_replies(401, mode_arg, "", "", "", "", "", "");
+                                }
+                            }
+                        }
+                        else if (modestring[index] == 'b'){
+                            if (is_client(mode_arg)){
+                                ban_client(mode_arg);
+                            }
+                            else {
+                                // return ERR_USERNOTINCHANNEL(mode_arg, this->name);
+                                return ":" + cli.get_prefix() + " 441 " + cli.nickname + " " + get_replies(443, mode_arg, this->name, "", "", "", "", "");
+                            }
+                        }
+                        else if (modestring[index] == 'i'){
+                            if (this->invite_only == false){
+                                this->invite_only = true;
+                                this->modes.push_back('i');
+                            }
+                        }
+                        else{
+                            this->modes.push_back(modestring[index]);
+                        }
                     }
                 }
                 else{
                     err_check = 1;
                 }
                 index++;
+                }
             }
         }
         toRet = ":" + cli.get_prefix() + " 324 " + cli.nickname + " " + get_replies(324, this->get_modes(), "", "", "", "", "", "");
@@ -216,6 +324,18 @@ public:
         }
     }
 
+    void    de_op(std::string   deop){
+        typename std::map<int, client>::iterator it = this->ops.begin();
+        while (it != this->ops.end()){
+            if (deop.compare(it->second.nickname) == 0){
+                this->clients.insert(std::make_pair(it->first, it->second));
+                this->ops.erase(it);
+                break;
+            }
+            it++;
+        }
+    }
+
     int    is_op(int check){
         typename std::map<int, client>::iterator it = this->ops.begin();
         while (it != this->ops.end()){
@@ -242,7 +362,7 @@ public:
         typename std::map<int, client>::iterator it = this->clients.begin();
         while (it != this->clients.end()){
             if (check == it->first){
-                return 1;
+                return check;
             }
             it++;
         }
@@ -256,6 +376,28 @@ public:
                 return 1;
             }
             it++;
+        }
+        return 0;
+    }
+
+    int is_invited(std::string check){
+        std::vector<std::string>::iterator ite = invitelist.end();
+
+        for (std::vector<std::string>::iterator it = invitelist.begin(); it != ite; it++){
+            if (it->compare(check) == 0){
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    int is_banned(int check){
+        std::vector<int>::iterator ite = banlist.end();
+
+        for (std::vector<int>::iterator it = banlist.begin(); it != ite; it++){
+            if (*it == check){
+                return 1;
+            }
         }
         return 0;
     }

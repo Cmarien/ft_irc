@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rmouduri <rmouduri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/02 10:08:18 by user42            #+#    #+#             */
-/*   Updated: 2022/06/08 14:56:11 by user42           ###   ########.fr       */
+/*   Created: 2022/05/18 14:35:28 by user42            #+#    #+#             */
+/*   Updated: 2022/06/06 16:43:53 by rmouduri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <vector>
 #include "utils.hpp"
 
 bool    check_charset(char toCheck, std::string charset){
@@ -37,10 +38,10 @@ bool    check_modes(char toCheck, std::vector<char> modes){
 
 void    clean_string(std::string &str){
     if (str[str.length() - 1] == '\n'){
-        str = str.substr(0, str.length() -2);
+        str = str.substr(0, str.length() -1);
     }
     if (str[str.length() - 1] == '\r'){
-        str = str.substr(0, str.length() -2);
+        str = str.substr(0, str.length() -1);
     }
 }
 

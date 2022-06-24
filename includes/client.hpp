@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rmouduri <rmouduri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/18 14:09:22 by user42            #+#    #+#             */
-/*   Updated: 2022/06/08 14:29:34 by user42           ###   ########.fr       */
+/*   Updated: 2022/06/06 19:07:33 by rmouduri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ class client
 private:
 public:
 	int client_socket;
+	int	chan_number;
 
 	std::string nickname;
 	std::string username;
@@ -45,6 +46,7 @@ public:
     std::vector<char> modes;
 
 	bool		is_registered;
+	bool		is_op;
 
 	server *serv;
 
@@ -57,6 +59,7 @@ public:
 	void	clear_client();
 	void	clear_buff();
 	void	remove_mode(char);
+	void	quit(std::string);
     std::string get_modes();
     std::string    add_modes(std::string modestring, std::string mode_arg);
 
